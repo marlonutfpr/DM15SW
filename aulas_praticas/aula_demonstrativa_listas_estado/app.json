@@ -1,0 +1,17 @@
+{
+  "expo": {
+    "name": "Cafeteria UTFPR",
+    "slug": "cafeteria-utfpr-estado",
+    "version": "1.0.0",
+    "scheme": "cafeteria",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "plugins": [
+      "expo-router",
+      "expo-font"
+    ],
+    "web": {
+      "bundler": "metro"
+    }
+  }
+}
