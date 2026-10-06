@@ -1,130 +1,105 @@
 import { useState } from 'react';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
-import { Link } from 'expo-router';
+import { View, FlatList, StyleSheet } from 'react-native';
+import { router } from 'expo-router';
 import { produtos, categorias } from '../../../dados/produtos';
+import { useFavoritos } from '../../../contexts/FavoritosContext';
 import Cartao from '../../../components/Cartao';
+import Filtro from '../../../components/Filtro';
+import ContadorFavoritos from '../../../components/ContadorFavoritos';
+import EstadoVazio from '../../../components/EstadoVazio';
+import Separador from '../../../components/Separador';
 
-// Rota "/" — o index do grupo (tabs) é a primeira tela do app.
+// Rota "/" — o Cardápio. Na Aula 12 era um `map` dentro de uma View; agora a
+// lista tem 24 produtos e é uma FlatList.
 export default function Cardapio() {
-  // Estado local da tela. Troque de aba e volte: o filtro continua aqui,
-  // porque as abas mantêm cada tela montada.
+  // ESTADO LOCAL: só esta tela usa o filtro. Não há motivo para subir.
   const [categoria, setCategoria] = useState('todos');
 
+  // ESTADO COMPARTILHADO: os favoritos vêm do contexto, não de useState.
+  const { favoritos, alternarFavorito, ehFavorito } = useFavoritos();
+
   // Derivar em vez de guardar: a lista filtrada sai do estado que já existe.
-  const produtosVisiveis =
+  const visiveis =
     categoria === 'todos'
       ? produtos
       : produtos.filter((produto) => produto.categoria === categoria);
 
-  return (
-    <View style={estilos.container}>
+  // O cabeçalho rola junto com a lista. Vai como ELEMENTO (<View>), não como
+  // função: assim ele não é desmontado a cada renderização.
+  const cabecalho = (
+    <View style={estilos.cabecalho}>
       <View style={estilos.filtros}>
-        <Pressable
-          style={[estilos.filtro, categoria === 'todos' && estilos.filtroAtivo]}
-          onPress={() => setCategoria('todos')}
-        >
-          <Text style={[estilos.textoFiltro, categoria === 'todos' && estilos.textoFiltroAtivo]}>
-            Todos
-          </Text>
-        </Pressable>
-
+        <Filtro
+          titulo="Todos"
+          ativo={categoria === 'todos'}
+          aoTocar={() => setCategoria('todos')}
+        />
+        {/* Quatro filtros, fixos: aqui `map` basta. */}
         {categorias.map((item) => (
-          <Pressable
+          <Filtro
             key={item.id}
-            style={[estilos.filtro, item.id === categoria && estilos.filtroAtivo]}
-            onPress={() => setCategoria(item.id)}
-          >
-            <Text style={[estilos.textoFiltro, item.id === categoria && estilos.textoFiltroAtivo]}>
-              {item.nome}
-            </Text>
-          </Pressable>
+            titulo={item.nome}
+            ativo={item.id === categoria}
+            aoTocar={() => setCategoria(item.id)}
+          />
         ))}
       </View>
 
-      {/* Lista pequena e fixa, então `map` basta. Lista longa é FlatList,
-          na Aula 13. */}
-      {produtosVisiveis.map((produto) => (
-        // `asChild` faz o Pressable funcionar como o link: é assim que um
-        // cartão inteiro vira navegação.
-        //
-        // O destino vai como objeto: `pathname` é a rota, com o [id] do nome
-        // do arquivo, e `params` preenche o colchete. Passa-se o
-        // identificador, não o produto inteiro — a tela de destino busca os
-        // dados pelo id.
-        <Link
-          key={produto.id}
-          href={{ pathname: '/produto/[id]', params: { id: produto.id } }}
-          asChild
-        >
-          <Pressable>
-            <Cartao nome={produto.nome} preco={produto.preco} />
-          </Pressable>
-        </Link>
-      ))}
-
-      <View style={estilos.experimentos}>
-        <Text style={estilos.secao}>Experimentos de navegação</Text>
-
-        {/* Link simples, renderizado como texto. O destino é uma tela do
-            drawer, fora do grupo (tabs). */}
-        <Link href="/sobre" style={estilos.link}>Sobre a cafeteria</Link>
-
-        {/* Nenhum arquivo responde por este caminho: aparece o +not-found. */}
-        <Link href="/rota-que-nao-existe" style={estilos.link}>
-          Abrir uma rota que não existe
-        </Link>
-
-        {/* A rota EXISTE: [id].js casa com qualquer valor. O que não existe
-            é o produto 999 — e a tela de detalhe não trata esse caso. */}
-        <Link href="/produto/999" style={estilos.link}>
-          Abrir um produto que não existe (tela vermelha)
-        </Link>
-      </View>
+      {/* O mesmo ContadorFavoritos da tela "Elevação de estado". Lá o total
+          vem do pai; aqui, do contexto. O componente não percebe diferença. */}
+      <ContadorFavoritos total={favoritos.length} />
     </View>
+  );
+
+  return (
+    <FlatList
+      style={estilos.lista}
+      contentContainerStyle={estilos.conteudo}
+      data={visiveis}
+      // A chave identifica cada item entre uma renderização e outra. Sempre
+      // texto: o id é número, então vira String.
+      keyExtractor={(item) => String(item.id)}
+      // `renderItem` recebe { item } e devolve o componente. {...item}
+      // espalha os campos do produto como props do Cartao.
+      renderItem={({ item }) => (
+        <Cartao
+          {...item}
+          favorito={ehFavorito(item.id)}
+          aoFavoritar={() => alternarFavorito(item.id)}
+          aoTocar={() =>
+            router.push({ pathname: '/produto/[id]', params: { id: item.id } })
+          }
+        />
+      )}
+      ListHeaderComponent={cabecalho}
+      // Experimente o filtro "Sazonais": nenhum produto, e a lista mostra
+      // isto sem nenhum `if` na tela.
+      ListEmptyComponent={
+        <EstadoVazio
+          icone="search-outline"
+          titulo="Nenhum produto encontrado."
+          texto="Não há produtos nesta categoria por enquanto."
+        />
+      }
+      ItemSeparatorComponent={Separador}
+    />
   );
 }
 
 const estilos = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-    gap: 10,
+  lista: {
     backgroundColor: '#ffffff',
+  },
+  conteudo: {
+    padding: 16,
+  },
+  cabecalho: {
+    gap: 12,
+    marginBottom: 12,
   },
   filtros: {
     flexDirection: 'row',
     flexWrap: 'wrap', // quebra a linha quando os filtros não cabem na largura
     gap: 8,
-    marginBottom: 4,
-  },
-  filtro: {
-    borderWidth: 1,
-    borderColor: '#a4492c',
-    borderRadius: 16,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-  },
-  filtroAtivo: {
-    backgroundColor: '#a4492c',
-  },
-  textoFiltro: {
-    color: '#a4492c',
-    fontSize: 14,
-  },
-  textoFiltroAtivo: {
-    color: '#ffffff',
-  },
-  experimentos: {
-    marginTop: 'auto', // empurra o bloco para o fim da tela
-    gap: 8,
-  },
-  secao: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#6b625c',
-  },
-  link: {
-    color: '#a4492c',
-    fontSize: 15,
   },
 });

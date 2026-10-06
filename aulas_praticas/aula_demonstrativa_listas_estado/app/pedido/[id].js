@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
-import { router, useLocalSearchParams } from 'expo-router';
+import { Link, router, useLocalSearchParams } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { produtos, formatarPreco } from '../../dados/produtos';
+import { buscarProduto, formatarPreco } from '../../dados/produtos';
+import { usePedidos } from '../../contexts/PedidosContext';
 import Botao from '../../components/Botao';
+import EstadoVazio from '../../components/EstadoVazio';
 
 // Rota "/pedido/<id>", apresentada como MODAL (ver app/_layout.js).
 //
@@ -11,13 +13,29 @@ import Botao from '../../components/Botao';
 // usuário exatamente aonde ele estava. Fechar é voltar: `router.back()`.
 export default function FazerPedido() {
   const { id } = useLocalSearchParams();
-  const produto = produtos.find((p) => p.id === Number(id));
+  const produto = buscarProduto(Number(id));
 
+  // ESTADO LOCAL: quantidade e confirmação só interessam a este modal, e
+  // morrem com ele. Não há motivo para subir.
   const [quantidade, setQuantidade] = useState(1);
   const [confirmado, setConfirmado] = useState(false);
 
+  // ESTADO COMPARTILHADO: a lista de pedidos é lida em outra tela.
+  const { adicionarPedido } = usePedidos();
+
+  // Os hooks vêm ANTES deste retorno antecipado: a ordem deles não pode
+  // mudar de uma renderização para outra.
+  if (!produto) {
+    return <EstadoVazio icone="alert-circle-outline" titulo="Produto não encontrado" />;
+  }
+
   // Derivado: sai da quantidade e do preço, não precisa de outro estado.
   const total = produto.preco * quantidade;
+
+  function confirmar() {
+    adicionarPedido({ produtoId: produto.id, quantidade, total });
+    setConfirmado(true);
+  }
 
   if (confirmado) {
     return (
@@ -27,10 +45,11 @@ export default function FazerPedido() {
         <Text style={estilos.aviso}>
           {quantidade} x {produto.nome} · {formatarPreco(total)}
         </Text>
-        <Text style={estilos.aviso}>
-          Nesta versão o pedido não é guardado em lugar nenhum: isso exige
-          estado compartilhado, que é a Aula 13.
-        </Text>
+        {/* O pedido foi para o PedidosContext. Outra tela, no drawer, já
+            consegue vê-lo. */}
+        <Link href="/pedidos" dismissTo style={estilos.link}>
+          Ver em Meus pedidos
+        </Link>
         <Botao titulo="Fechar" aoTocar={() => router.back()} />
       </View>
     );
@@ -68,7 +87,7 @@ export default function FazerPedido() {
         <Botao
           titulo="Confirmar pedido"
           icone="checkmark-circle"
-          aoTocar={() => setConfirmado(true)}
+          aoTocar={confirmar}
         />
         {/* Cancelar e Fechar fazem a mesma coisa: voltar. O modal sai da
             pilha e a tela de baixo reaparece como estava. */}
@@ -126,6 +145,11 @@ const estilos = StyleSheet.create({
     fontWeight: '600',
     minWidth: 32,
     textAlign: 'center',
+  },
+  link: {
+    color: '#a4492c',
+    fontSize: 15,
+    fontWeight: '600',
   },
   total: {
     fontSize: 18,

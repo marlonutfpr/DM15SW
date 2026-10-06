@@ -1,40 +1,55 @@
-import { View, Text, StyleSheet } from 'react-native';
-import Ionicons from '@expo/vector-icons/Ionicons';
+import { FlatList, StyleSheet } from 'react-native';
+import { router } from 'expo-router';
+import { produtos } from '../../../dados/produtos';
+import { useFavoritos } from '../../../contexts/FavoritosContext';
+import Cartao from '../../../components/Cartao';
+import EstadoVazio from '../../../components/EstadoVazio';
+import Separador from '../../../components/Separador';
 
-// Rota "/favoritos" — e não "/(tabs)/favoritos": o grupo não entra na URL.
-//
-// Tela provisória. O botão Favoritar do detalhe guarda o estado DENTRO
-// daquela tela, e esta aba não tem como saber dele. Decidir onde esse estado
-// deve morar é a Aula 13.
+// Rota "/favoritos". Na Aula 12 esta aba era sempre vazia: o favorito ficava
+// preso dentro da tela de detalhe. Agora as duas telas leem o MESMO estado,
+// o do FavoritosProvider.
 export default function Favoritos() {
+  const { favoritos, alternarFavorito } = useFavoritos();
+
+  // O contexto guarda só os ids; os produtos completos saem dos dados.
+  // Derivado a cada renderização — não é outro estado.
+  const itens = produtos.filter((produto) => favoritos.includes(produto.id));
+
   return (
-    <View style={estilos.container}>
-      <Ionicons name="heart-outline" size={48} color="#6b625c" />
-      <Text style={estilos.titulo}>Nenhum favorito ainda</Text>
-      <Text style={estilos.texto}>
-        Favorite um produto no detalhe e volte aqui: nada muda. Como esta aba
-        sabe o que foi favoritado no Cardápio?
-      </Text>
-    </View>
+    <FlatList
+      style={estilos.lista}
+      contentContainerStyle={estilos.conteudo}
+      data={itens}
+      keyExtractor={(item) => String(item.id)}
+      renderItem={({ item }) => (
+        <Cartao
+          {...item}
+          // Aqui todos são favoritos: tocar no coração tira o item da lista.
+          favorito
+          aoFavoritar={() => alternarFavorito(item.id)}
+          aoTocar={() =>
+            router.push({ pathname: '/produto/[id]', params: { id: item.id } })
+          }
+        />
+      )}
+      ListEmptyComponent={
+        <EstadoVazio
+          icone="heart-outline"
+          titulo="Nenhum favorito ainda"
+          texto="Toque no coração de um produto no Cardápio ou no detalhe: ele aparece aqui."
+        />
+      }
+      ItemSeparatorComponent={Separador}
+    />
   );
 }
 
 const estilos = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 10,
-    padding: 24,
+  lista: {
     backgroundColor: '#ffffff',
   },
-  titulo: {
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  texto: {
-    fontSize: 14,
-    color: '#6b625c',
-    textAlign: 'center',
+  conteudo: {
+    padding: 16,
   },
 });

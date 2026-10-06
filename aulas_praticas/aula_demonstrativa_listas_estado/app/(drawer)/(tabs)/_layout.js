@@ -1,31 +1,29 @@
 import { Tabs } from 'expo-router';
 import { DrawerToggleButton } from 'expo-router/drawer';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useFavoritos } from '../../../contexts/FavoritosContext';
 
-// Layout do grupo (tabs): as abas. A estrutura é a mesma do Stack: um
-// componente de layout e uma Screen por arquivo.
+// Layout do grupo (tabs). Um layout também é componente: está dentro do
+// FavoritosProvider (app/_layout.js) e pode ler o contexto como qualquer
+// tela. É assim que o selo da aba Favoritos acompanha o total.
 export default function TabsLayout() {
+  const { favoritos } = useFavoritos();
+
   return (
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: '#a4492c',
         headerTintColor: '#a4492c',
-        // Botão que abre o drawer. As abas estão DENTRO dele, então o botão
-        // encontra o navegador de fora sozinho.
         headerLeft: () => (
           <DrawerToggleButton tintColor="#a4492c" accessibilityLabel="Abrir menu" />
         ),
       }}
     >
-      {/* `tabBarIcon` recebe a cor e o tamanho já calculados pela barra: a
-          aba ativa chega com a cor de `tabBarActiveTintColor`. */}
       <Tabs.Screen
         name="index"
         options={{
           title: 'Cardápio',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="cafe" color={color} size={size} />
-          ),
+          tabBarIcon: ({ color, size }) => <Ionicons name="cafe" color={color} size={size} />,
         }}
       />
 
@@ -33,9 +31,10 @@ export default function TabsLayout() {
         name="favoritos"
         options={{
           title: 'Favoritos',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="heart" color={color} size={size} />
-          ),
+          // Sem favoritos, `undefined` esconde o selo (0 apareceria como "0").
+          tabBarBadge: favoritos.length > 0 ? favoritos.length : undefined,
+          tabBarBadgeStyle: { backgroundColor: '#a4492c' },
+          tabBarIcon: ({ color, size }) => <Ionicons name="heart" color={color} size={size} />,
         }}
       />
     </Tabs>
