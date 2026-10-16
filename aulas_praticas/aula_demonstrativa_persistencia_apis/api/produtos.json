@@ -1,0 +1,170 @@
+[
+  {
+    "id": 1,
+    "title": "Café especial",
+    "price": 20,
+    "description": "Grão da região, coado na hora. Xícara de 200 ml.",
+    "category": "bebidas"
+  },
+  {
+    "id": 2,
+    "title": "Espresso",
+    "price": 8,
+    "description": "Curto e encorpado, tirado na máquina.",
+    "category": "bebidas"
+  },
+  {
+    "id": 3,
+    "title": "Cappuccino",
+    "price": 18.5,
+    "description": "Espresso, leite vaporizado e canela.",
+    "category": "bebidas"
+  },
+  {
+    "id": 4,
+    "title": "Pão de queijo",
+    "price": 7.5,
+    "description": "Porção com três unidades, assadas na hora.",
+    "category": "salgados"
+  },
+  {
+    "id": 5,
+    "title": "Coxinha",
+    "price": 9,
+    "description": "Frango desfiado com requeijão.",
+    "category": "salgados"
+  },
+  {
+    "id": 6,
+    "title": "Bolo de cenoura",
+    "price": 12,
+    "description": "Fatia com cobertura de chocolate.",
+    "category": "doces"
+  },
+  {
+    "id": 7,
+    "title": "Latte",
+    "price": 16,
+    "description": "Espresso com bastante leite vaporizado.",
+    "category": "bebidas"
+  },
+  {
+    "id": 8,
+    "title": "Mocha",
+    "price": 19,
+    "description": "Espresso, chocolate e leite vaporizado.",
+    "category": "bebidas"
+  },
+  {
+    "id": 9,
+    "title": "Chá mate",
+    "price": 6,
+    "description": "Gelado, com limão.",
+    "category": "bebidas"
+  },
+  {
+    "id": 10,
+    "title": "Chocolate quente",
+    "price": 14,
+    "description": "Cremoso, com chantili.",
+    "category": "bebidas"
+  },
+  {
+    "id": 11,
+    "title": "Suco de laranja",
+    "price": 10,
+    "description": "Natural, copo de 300 ml.",
+    "category": "bebidas"
+  },
+  {
+    "id": 12,
+    "title": "Água com gás",
+    "price": 5,
+    "description": "Garrafa de 500 ml.",
+    "category": "bebidas"
+  },
+  {
+    "id": 13,
+    "title": "Esfirra de carne",
+    "price": 8.5,
+    "description": "Aberta, com limão à parte.",
+    "category": "salgados"
+  },
+  {
+    "id": 14,
+    "title": "Empada de palmito",
+    "price": 9.5,
+    "description": "Massa amanteigada.",
+    "category": "salgados"
+  },
+  {
+    "id": 15,
+    "title": "Misto quente",
+    "price": 11,
+    "description": "Pão de forma, presunto e queijo na chapa.",
+    "category": "salgados"
+  },
+  {
+    "id": 16,
+    "title": "Pastel de queijo",
+    "price": 8,
+    "description": "Frito na hora.",
+    "category": "salgados"
+  },
+  {
+    "id": 17,
+    "title": "Quiche de alho-poró",
+    "price": 13,
+    "description": "Fatia individual.",
+    "category": "salgados"
+  },
+  {
+    "id": 18,
+    "title": "Croissant",
+    "price": 10,
+    "description": "Folhado, com manteiga.",
+    "category": "salgados"
+  },
+  {
+    "id": 19,
+    "title": "Brigadeiro",
+    "price": 4,
+    "description": "Unidade, com granulado.",
+    "category": "doces"
+  },
+  {
+    "id": 20,
+    "title": "Brownie",
+    "price": 9,
+    "description": "Com nozes, servido morno.",
+    "category": "doces"
+  },
+  {
+    "id": 21,
+    "title": "Torta de limão",
+    "price": 13.5,
+    "description": "Fatia com merengue maçaricado.",
+    "category": "doces"
+  },
+  {
+    "id": 22,
+    "title": "Cookie",
+    "price": 7,
+    "description": "Gotas de chocolate.",
+    "category": "doces"
+  },
+  {
+    "id": 23,
+    "title": "Pudim",
+    "price": 10,
+    "description": "Fatia, calda de caramelo.",
+    "category": "doces"
+  },
+  {
+    "id": 24,
+    "title": "Cuca de banana",
+    "price": 11,
+    "description": "Receita da região, com farofa doce.",
+    "category": "doces"
+  }
+]
