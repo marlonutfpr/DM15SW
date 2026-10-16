@@ -45,9 +45,9 @@ Aplicativo de apoio à **Aula 15**: dados que sobrevivem ao app e dados que vêm
 - **`useFocusEffect`** na tela "Dados salvos", que relê o armazenamento toda vez que a tela ganha o foco.
 - **`CampoTexto`**, o primeiro `TextInput` da Cafeteria, como componente controlado.
 
-**Dois pontos em que o slide simplifica**, conferidos no app em 16/10/2026:
+**Dois pontos em que o slide simplificava**, conferidos no app em 16/10/2026 e já corrigidos no deck (texto do "Ponto de atenção" e notas do apresentador dos slides 6 e 8):
 
-- **Slide 6, o controle `carregado`.** O slide diz que, sem ele, a lista vazia apaga o que estava salvo. Na ordem do slide (ler primeiro, gravar depois), apagar o `if (carregado)` **não apaga nada**: a leitura é pedida antes da gravação e o AsyncStorage atende na ordem. O erro aparece quando o efeito de gravar fica **acima** do de ler, ordem comum em código gerado. A mensagem para a turma muda pouco, e fica mais forte: sem o `carregado`, o código funciona por sorte. O passo 4 do roteiro provoca o erro do jeito que ele acontece.
+- **Slide 6, o controle `carregado`.** O slide dizia que, sem ele, a lista vazia apaga o que estava salvo. Na ordem do slide (ler primeiro, gravar depois), apagar o `if (carregado)` **não apaga nada**: a leitura é pedida antes da gravação e o AsyncStorage atende na ordem. O erro aparece quando o efeito de gravar fica **acima** do de ler, ordem comum em código gerado. A mensagem para a turma muda pouco, e fica mais forte: sem o `carregado`, o código funciona por sorte. O passo 4 do roteiro provoca o erro do jeito que ele acontece.
 - **Slide 8, `resposta.ok`, na web.** Com o CEP "123", o ViaCEP responde 400, mas sem o cabeçalho de CORS. No navegador o `fetch` rejeita como erro de rede e o `if (!resposta.ok)` nem chega a rodar; no celular, o 400 chega e o `if` trata. Para mostrar o `resposta.ok` na web, use o passo 6 do roteiro, com o GitHub, que responde 404 com CORS.
 
 **Ficou de fora de propósito**, por ser conteúdo posterior: Firestore no lugar do AsyncStorage (Aula 18), chave de API e intermediário (Aulas 18 e 21), login (Aula 20).
