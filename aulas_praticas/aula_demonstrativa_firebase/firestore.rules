@@ -1,0 +1,31 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Cardápio: todos leem, gravação só pelo console (slide 22).
+    match /produtos/{produtoId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Cada pedido, só do seu dono (slide 23).
+    match /pedidos/{pedidoId} {
+      // ler: só o dono do pedido
+      allow read: if request.auth != null
+        && resource.data.usuarioId == request.auth.uid;
+      // criar: só em nome de si mesmo
+      allow create: if request.auth != null
+        && request.resource.data.usuarioId == request.auth.uid;
+      // pedido feito não muda pelo app
+      allow update, delete: if false;
+    }
+
+    // Favoritos: o uid está no CAMINHO, e não num campo. Só o dono lê e grava
+    // a própria subcoleção.
+    match /usuarios/{uid}/favoritos/{produtoId} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // Qualquer outro caminho: negado, porque nenhuma regra o permite.
+  }
+}
