@@ -5,15 +5,23 @@ import {
   signOut,
 } from 'firebase/auth';
 import { auth } from './firebase';
+import { garantirUsuario } from './usuarios';
 
 // A tela chama estas funções, nunca o SDK direto: é a camada de serviços da
 // Aula 15. O Firebase já recusa senha com menos de 6 caracteres e e-mail
 // repetido.
-export const cadastrar = (email, senha) =>
-  createUserWithEmailAndPassword(auth, email, senha);
+//
+// A conta nasce no Authentication, que devolve o uid. Só então dá para
+// gravar usuarios/{uid}: a regra exige que quem grava já esteja autenticado.
+export async function cadastrar(nome, email, senha) {
+  const { user } = await createUserWithEmailAndPassword(auth, email, senha);
+  await garantirUsuario(user, nome);
+}
 
-export const entrar = (email, senha) =>
-  signInWithEmailAndPassword(auth, email, senha);
+export async function entrar(email, senha) {
+  const { user } = await signInWithEmailAndPassword(auth, email, senha);
+  await garantirUsuario(user);
+}
 
 export const sair = () => signOut(auth);
 

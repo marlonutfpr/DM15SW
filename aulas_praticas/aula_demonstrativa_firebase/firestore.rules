@@ -20,6 +20,11 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
+    // Dados do usuário: o id do documento é o uid do Authentication.
+    match /usuarios/{uid} {
+      allow read, create, update: if request.auth != null && request.auth.uid == uid;
+    }
+
     // Favoritos: o uid está no CAMINHO, e não num campo. Só o dono lê e grava
     // a própria subcoleção.
     match /usuarios/{uid}/favoritos/{produtoId} {

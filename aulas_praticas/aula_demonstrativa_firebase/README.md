@@ -42,6 +42,7 @@ O Cardápio, a aba Favoritos e o `ProdutosContext` são os mesmos da Aula 15. É
 - **Mensagens de erro do login** traduzidas em `services/auth.js`, sem dizer se foi o e-mail ou a senha que errou (slide 19).
 - **Providers dentro de `(app)`**, e não no layout raiz: a escuta dos favoritos precisa do uid, e ao sair o grupo desmonta e encerra as escutas.
 - **Favoritos em subcoleção** do usuário, com o uid no caminho; a regra compara o caminho, e não um campo.
+- **Documento do usuário** em `usuarios/{uid}` (`services/usuarios.js`): criado no cadastro, que pede o nome completo, com o uid do Authentication como id, e lido em "Minha conta". Uma conta sem documento ganha o seu no próximo login, sem nome.
 - **`scripts/popular-produtos.mjs`**, que grava os 24 produtos enquanto o banco está em modo de teste.
 
 ## Como preparar o Firebase
@@ -91,6 +92,11 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
+    // Dados do usuário: o id do documento é o uid do Authentication.
+    match /usuarios/{uid} {
+      allow read, create, update: if request.auth != null && request.auth.uid == uid;
+    }
+
     // Favoritos: o uid está no caminho.
     match /usuarios/{uid}/favoritos/{produtoId} {
       allow read, write: if request.auth != null && request.auth.uid == uid;
@@ -105,6 +111,7 @@ service cloud.firestore {
 | :--- | :--- | :--- | :--- |
 | `produtos` | `p1` a `p24` | `nome`, `preco`, `categoria`, `descricao`, `criadoEm` | Cardápio, Favoritos, detalhe, pedido |
 | `pedidos` | id automático | `usuarioId`, `criadoEm`, `status`, `itens[]` (`produtoId`, `nome`, `preco`, `quantidade`), `total` | "Meus pedidos", só os do usuário |
+| `usuarios` | uid do Authentication | `nome`, `email`, `criadoEm` | "Minha conta", só o próprio usuário |
 | `usuarios/{uid}/favoritos` | id do produto | `criadoEm` | Cardápio, Favoritos, detalhe |
 
 ## A árvore
@@ -126,7 +133,7 @@ app/
         ├── sobre.js
         └── (tabs)/              # Cardápio e Favoritos, iguais aos da Aula 15
 
-services/   firebase.js, auth.js, produtos.js, pedidos.js, favoritos.js, cep.js
+services/   firebase.js, auth.js, usuarios.js, produtos.js, pedidos.js, favoritos.js, cep.js
 hooks/      useUsuario.js
 scripts/    popular-produtos.mjs, produtos.json
 firestore.rules, firestore.indexes.json, firebase.json

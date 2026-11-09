@@ -12,17 +12,34 @@ import Botao from '../components/Botao';
 // chama `entrar`. O onAuthStateChanged percebe a sessão nova, o layout raiz
 // troca as rotas protegidas e o Expo Router leva ao cardápio.
 export default function Login() {
+  // false: entrar; true: criar conta, que pede também o nome
+  const [criando, setCriando] = useState(false);
+  const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState(null);
+
+  function trocarModo() {
+    setCriando(!criando);
+    setErro(null);
+  }
+
+  function criarConta() {
+    // Valida antes do Firebase: depois do createUser, a conta já existe.
+    if (nome.trim().split(/\s+/).length < 2) {
+      setErro('Digite o nome completo.');
+      return;
+    }
+    enviar(() => cadastrar(nome.trim(), email.trim(), senha));
+  }
 
   // `acao` é entrar ou cadastrar: mesma tela, mesmos estados.
   async function enviar(acao) {
     setEnviando(true);
     setErro(null);
     try {
-      await acao(email.trim(), senha);
+      await acao();
     } catch (e) {
       setErro(mensagemDeErro(e));
       setEnviando(false);
@@ -42,6 +59,16 @@ export default function Login() {
         <Text style={estilos.texto}>Entre para ver o cardápio, favoritar e fazer pedidos.</Text>
       </View>
 
+      {criando && (
+        <CampoTexto
+          rotulo="Nome completo"
+          valor={nome}
+          aoMudar={setNome}
+          placeholder="Seu nome e sobrenome"
+          autoCapitalize="words"
+          autoComplete="name"
+        />
+      )}
       <CampoTexto
         rotulo="E-mail"
         valor={email}
@@ -64,16 +91,16 @@ export default function Login() {
 
       <View style={estilos.acoes}>
         <Botao
-          titulo={enviando ? 'Aguarde...' : 'Entrar'}
-          icone="log-in-outline"
-          aoTocar={() => enviar(entrar)}
+          titulo={enviando ? 'Aguarde...' : criando ? 'Criar conta' : 'Entrar'}
+          icone={criando ? 'person-add-outline' : 'log-in-outline'}
+          aoTocar={criando ? criarConta : () => enviar(() => entrar(email.trim(), senha))}
           desabilitado={enviando}
         />
         <Botao
-          titulo="Criar conta"
+          titulo={criando ? 'Já tenho conta' : 'Criar conta'}
           variante="secundario"
-          icone="person-add-outline"
-          aoTocar={() => enviar(cadastrar)}
+          icone={criando ? 'log-in-outline' : 'person-add-outline'}
+          aoTocar={trocarModo}
           desabilitado={enviando}
         />
       </View>
